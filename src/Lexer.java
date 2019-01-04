@@ -3,88 +3,182 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import static utils.LexerHelper.*;
+
 public class Lexer {
 
+    private final char eofCh = '\004';
+    private final char eolnCh = '\n';
     private BufferedReader input;
+    private char ch = ' ';
+    private String line = "";
+    private int lineno = 0;
+    private int col = 1;
 
-    private final String letters = "أبتثجحخدذرزسشصضطظعغفقكلمنهويى";
 
-    public Lexer(String fileName){
+    public Lexer(String fileName) {
 
         try {
             input = new BufferedReader(new FileReader(fileName));
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.out.println("File not found: " + fileName);
             System.exit(1);
         }
 
     }
 
-    //do tokenization....
-    private Token nextToken(){
+    public static void main(String[] argv) {
 
-        String line="";
-
-
+        Lexer lexer = new Lexer("input.txt");
+        Token token;
         try {
+            token = lexer.nextToken();
+        while (token.type != TokenType.Eof) {
+                System.out.println(token.value + "  " + token.type);
+                token = lexer.nextToken();
+            }
 
-          // while(input.read() ==' ' || input.read()=='\t' || input.read()=='\r' ) input.read();
-           line = input.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        line = reverse(line);
+        System.out.println("end of file ");
 
-        for(int i = 0 ;i<line.length();i++)
-            System.out.println(isLetter(line.charAt(i)));
-
-
-
-
-
-       // System.out.println(reverse(line));
-
-
-        return new Token(TokenType.Eof,"asd");
 
     }
 
-    //utils
+    private char nextChar() { // Return next char
+        if (ch == eofCh)
+            error("Attempt to read past end of file");
+        col++;
+        if (col >= line.length()) {
+            try {
+                line = input.readLine();
+            } catch (IOException e) {
+                System.err.println(e);
+                System.exit(1);
+            } // try
+            if (line == null) // at end of file
+                line = "" + eofCh;
+            else {
+                // System.out.println(lineno + ":\t" + line);
+                lineno++;
+                line += eolnCh;
+            } // if line
+            col = 0;
+        } // if col
+        return line.charAt(col);
+    }//nextChar
 
-    private boolean isLetter(char c)
-    {
 
-        boolean isLetter=false;
-        for(int i=0;i<letters.length();i++)
-            if(c==letters.charAt(i)) {
-                isLetter = true;
-                break;
-            }
+    private Token nextToken() throws IOException {
 
-            return isLetter;
+        do {
+            if (isAlpha(ch)) {
+
+                String lexeme = concat(letters + digits);
+                return identifyLexeme(lexeme);
+            } else if (isDigit(ch)) { // int  literal
+                String number = concat(digits);
+
+                // int Literal
+                return new Token(TokenType.IntLiteral, number);
+
+            } else switch (ch) {
+                case ' ':
+                case '\t':
+                case '\r':
+                case eolnCh:
+                    ch = nextChar();
+
+                    break;
+
+                case eofCh:
+                    return new Token(TokenType.Eof, "eof");
+
+                case '+':
+                    ch = nextChar();
+                    return new Token(TokenType.Minus, "+");
+
+
+                case '-':
+                    ch = nextChar();
+                    return new Token(TokenType.Assign, "-");
+
+                case '*':
+                    ch = nextChar();
+                    return new Token(TokenType.Multiply, "*");
+
+                case '/':
+                    ch = nextChar();
+                    return new Token(TokenType.Divide, "/");
+
+
+                case '(':
+                    ch = nextChar();
+                    return new Token(TokenType.LeftParen, "(");
+
+                case ')':
+                    ch = nextChar();
+                    return new Token(TokenType.RightParen, ")");
+
+
+                case '=':
+                    ch = nextChar();
+                    return new Token(TokenType.Assign, "=");
+
+                case '>':
+                    return chkOpt('=', new Token(TokenType.Greater, "<"),
+                            new Token(TokenType.GreaterEqual, "=<"));
+
+                case '<':
+                    return chkOpt('=', new Token(TokenType.Less, ">"),
+                            new Token(TokenType.LessEqual, "=>"));
+
+
+                default:
+                    error("Illegal character " + ch);
+            } // switch
+        } while (true);
+
     }
-     private String reverse(String line){
-        String reverse="";
-        for(int i = line. length() - 1; i >= 0; i--)
-        {
-            reverse += line.charAt(i);
-        }
 
-        return reverse;
+    private Token chkOpt(char c, Token one, Token two) {
+
+        ch = nextChar();
+        if (ch != c)
+            return one;
+        ch = nextChar();
+        return two;
     }
 
-    public static void main(String[] argv){
+    private String concat(String set) {
+        String r = "";
+        do {
+            r += ch;
+            ch = nextChar();
+        } while (set.indexOf(ch) >= 0);
+        return r;
+    }
 
-        Lexer lexer = new Lexer("input.txt");
-        Token token = lexer.nextToken();
+    Token identifyLexeme(String lexeme) {
 
-        while(token.type != TokenType.Eof){
-            System.out.println(token);
-            token = lexer.nextToken();
-        }
+             if (lexeme.equals("صحيح") ) return new Token(TokenType.Int, lexeme);
+        else if (lexeme.equals("نصى")  ) return new Token(TokenType.String, lexeme);
+        else if (lexeme.equals("منطقى")) return new Token(TokenType.Bool, lexeme);
+        else if (lexeme.equals("ادخل") ) return new Token(TokenType.Enter, lexeme);
+        else if (lexeme.equals("اطبع") ) return new Token(TokenType.Print, lexeme);
+        else if (lexeme.equals("نفذ")  ) return new Token(TokenType.Execute, lexeme);
+        else if (lexeme.equals("اذا")  ) return new Token(TokenType.If, lexeme);
+        else if (lexeme.equals("من")   ) return new Token(TokenType.From, lexeme);
+        else if (lexeme.equals("حتى")  ) return new Token(TokenType.To, lexeme);
+        else if (lexeme.equals("خطوة") ) return new Token(TokenType.Step, lexeme);
+        else return new Token(TokenType.Identifier, lexeme);
+    }
 
-
+    public void error(String msg) {
+        System.err.print(line);
+        System.err.println("Error: column " + col + " " + msg);
+        System.exit(1);
     }
 }
