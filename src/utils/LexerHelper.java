@@ -1,15 +1,24 @@
 package utils;
 
+
+
 public class LexerHelper {
 
-    private static final String letters = "أبتثجحخدذرزسشصضطظعغفقكلمنهويى";
+    public static final String letters = "اأبتثجحخدذرزسشصضطظعغفقكلمنهويىة";
+    public static final String digits = "0123456789";
 
-    public static boolean isLetter(char ch)
-    {
 
-        boolean isLetter=false;
-        for(int i=0;i<letters.length();i++)
-            if(ch==letters.charAt(i)) {
+
+    /**
+     *
+     * @param ch a character
+     * @return true if it's an alphapet ,otherwise false
+     */
+    public static boolean isAlpha(char ch) {
+
+        boolean isLetter = false;
+        for (int i = 0; i < letters.length(); i++)
+            if (ch == letters.charAt(i)) {
                 isLetter = true;
                 break;
             }
@@ -17,13 +26,22 @@ public class LexerHelper {
         return isLetter;
     }
 
-    public static String reverse(String line){
-        String reverse="";
-        for(int i = line. length() - 1; i >= 0; i--)
-        {
-            reverse += line.charAt(i);
-        }
+    /**
+     *
+     * @param ch a character
+     * @return true if it's a digit ,otherwise false
+     */
+    public static boolean isDigit(char ch) {
 
-        return reverse;
+        boolean isDigit = false;
+        for (int i = 0; i < digits.length(); i++)
+            if (ch == digits.charAt(i)) {
+                isDigit = true;
+                break;
+            }
+
+        return isDigit;
     }
+
+
 }
