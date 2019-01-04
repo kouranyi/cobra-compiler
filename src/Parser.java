@@ -1,16 +1,13 @@
+// Recursive descent parser
 public class Parser {
 
-    // Recursive descent parser that inputs a C++Lite program and
-    // generates its abstract syntax.  Each method corresponds to
-    // a concrete syntax grammar rule, which appears as a comment
-    // at the beginning of the method.
 
-    Token token;          // current token from the input stream
+    Token token;          // current token
     Lexer lexer;
 
-    public Parser(Lexer ts) { // Open the C++Lite source program
-        lexer = ts;                          // as a token stream, and
-        token = lexer.nextToken();            // retrieve its first Token
+    public Parser(Lexer ts) {
+        lexer = ts;
+        token = lexer.nextToken();            // retrieve first Token
     }
 
     public static void main(String[] argv) {
