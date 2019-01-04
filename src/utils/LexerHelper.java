@@ -1,16 +1,13 @@
 package utils;
 
 
-
 public class LexerHelper {
 
     public static final String letters = "اأبتثجحخدذرزسشصضطظعغفقكلمنهويىة";
     public static final String digits = "0123456789";
 
 
-
     /**
-     *
      * @param ch a character
      * @return true if it's an alphapet ,otherwise false
      */
@@ -27,7 +24,6 @@ public class LexerHelper {
     }
 
     /**
-     *
      * @param ch a character
      * @return true if it's a digit ,otherwise false
      */

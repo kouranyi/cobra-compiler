@@ -31,15 +31,13 @@ public class Lexer {
 
         Lexer lexer = new Lexer("input.txt");
         Token token;
-        try {
-            token = lexer.nextToken();
-        while (token.type != TokenType.Eof) {
-                System.out.println(token.value + "  " + token.type);
-                token = lexer.nextToken();
-            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        token = lexer.nextToken();
+        while (token.type != TokenType.Eof) {
+            System.out.println(token.value + "  " + token.type);
+            token = lexer.nextToken();
+
+
         }
 
         System.out.println("end of file ");
@@ -71,7 +69,7 @@ public class Lexer {
     }//nextChar
 
 
-    private Token nextToken() throws IOException {
+    public Token nextToken() {
 
         do {
             if (isAlpha(ch)) {
@@ -98,12 +96,12 @@ public class Lexer {
 
                 case '+':
                     ch = nextChar();
-                    return new Token(TokenType.Minus, "+");
+                    return new Token(TokenType.Plus, "+");
 
 
                 case '-':
                     ch = nextChar();
-                    return new Token(TokenType.Assign, "-");
+                    return new Token(TokenType.Minus, "-");
 
                 case '*':
                     ch = nextChar();
@@ -114,11 +112,11 @@ public class Lexer {
                     return new Token(TokenType.Divide, "/");
 
 
-                case '(':
+                case ')':
                     ch = nextChar();
                     return new Token(TokenType.LeftParen, "(");
 
-                case ')':
+                case '(':
                     ch = nextChar();
                     return new Token(TokenType.RightParen, ")");
 
@@ -163,16 +161,16 @@ public class Lexer {
 
     Token identifyLexeme(String lexeme) {
 
-             if (lexeme.equals("صحيح") ) return new Token(TokenType.Int, lexeme);
-        else if (lexeme.equals("نصى")  ) return new Token(TokenType.String, lexeme);
+        if (lexeme.equals("صحيح")) return new Token(TokenType.Int, lexeme);
+        else if (lexeme.equals("نصى")) return new Token(TokenType.String, lexeme);
         else if (lexeme.equals("منطقى")) return new Token(TokenType.Bool, lexeme);
-        else if (lexeme.equals("ادخل") ) return new Token(TokenType.Enter, lexeme);
-        else if (lexeme.equals("اطبع") ) return new Token(TokenType.Print, lexeme);
-        else if (lexeme.equals("نفذ")  ) return new Token(TokenType.Execute, lexeme);
-        else if (lexeme.equals("اذا")  ) return new Token(TokenType.If, lexeme);
-        else if (lexeme.equals("من")   ) return new Token(TokenType.From, lexeme);
-        else if (lexeme.equals("حتى")  ) return new Token(TokenType.To, lexeme);
-        else if (lexeme.equals("خطوة") ) return new Token(TokenType.Step, lexeme);
+        else if (lexeme.equals("ادخل")) return new Token(TokenType.Enter, lexeme);
+        else if (lexeme.equals("اطبع")) return new Token(TokenType.Print, lexeme);
+        else if (lexeme.equals("نفذ")) return new Token(TokenType.Execute, lexeme);
+        else if (lexeme.equals("اذا")) return new Token(TokenType.If, lexeme);
+        else if (lexeme.equals("من")) return new Token(TokenType.From, lexeme);
+        else if (lexeme.equals("حتى")) return new Token(TokenType.To, lexeme);
+        else if (lexeme.equals("خطوة")) return new Token(TokenType.Step, lexeme);
         else return new Token(TokenType.Identifier, lexeme);
     }
 

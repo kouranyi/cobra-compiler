@@ -13,48 +13,53 @@ public class Parser {
         token = lexer.nextToken();            // retrieve its first Token
     }
 
+    public static void main(String[] argv) {
+        Parser parser = new Parser(new Lexer("input.txt"));
+        parser.start();
 
-
-    void start(){
-        program();
-        match(TokenType.Eof);
     }
 
-    //program -> declarations statements
-    void program(){
+    void start() {
+        program();
+        System.out.println("No Syntax Errors :) ");
+    }
+
+    //program -> {declarations} statements
+    void program() {
         declarations();
         statements();
-        System.out.println("No Syntax Errors");
-    }
-    //statements -> {statement}*
-    void statements(){
-        statement();
-        while(token.type.equals(TokenType.Enter)|
-              token.type.equals(TokenType.Print)|
-              token.type.equals(TokenType.Identifier)|
-              token.type.equals(TokenType.If)|
-              token.type.equals(TokenType.From)) {
-
-                 statement();
-        }
-
 
     }
     //statement -> choiceStmnt | repetitionStmnt|assignmentStmnt|
     //               inputStmnt|printStmnt
 
-    void statement(){
-        if(token.type.equals(TokenType.Enter) ){
+    //statements -> {statement}*
+    void statements() {
+        statement();
+        while (token.type.equals(TokenType.Enter) |
+                token.type.equals(TokenType.Print) |
+                token.type.equals(TokenType.Identifier) |
+                token.type.equals(TokenType.If) |
+                token.type.equals(TokenType.From)) {
+
+            statement();
+        }
+
+
+    }
+
+    void statement() {
+        if (token.type.equals(TokenType.Enter)) {
             match(TokenType.Enter);
             match(TokenType.Identifier);
-        }else if(token.type.equals(TokenType.Print) ){
+        } else if (token.type.equals(TokenType.Print)) {
             match(TokenType.Print);
             match(TokenType.Identifier);
-        }else if(token.type.equals(TokenType.Identifier)){
+        } else if (token.type.equals(TokenType.Identifier)) {
             match(TokenType.Identifier);
             match(TokenType.Assign);
-            match(TokenType.Identifier);
-        }else if (token.type.equals(TokenType.If) ){
+            exp();
+        } else if (token.type.equals(TokenType.If)) {
             match(TokenType.If);
             match(TokenType.RightParen);
             exp();
@@ -62,7 +67,7 @@ public class Parser {
             match(TokenType.Execute);
             statements();
 
-        }else if (token.type.equals(TokenType.From)) {
+        } else if (token.type.equals(TokenType.From)) {
 
             match(TokenType.From);
             match(TokenType.Identifier);
@@ -74,26 +79,27 @@ public class Parser {
             numbers();
             match(TokenType.Execute);
             statements();
-        }else
+        } else
             error(token.type);
 
     }
 
-    void exp(){
+    void exp() {
         operator1();
         operation1();
     }
-    void operation1(){
 
-        if( token.type.equals(TokenType.Greater) ){
+    void operation1() {
+
+        if (token.type.equals(TokenType.Greater)) {
             match(TokenType.Greater);
-        }else if(token.type.equals(TokenType.GreaterEqual) ){
+        } else if (token.type.equals(TokenType.GreaterEqual)) {
             match(TokenType.GreaterEqual);
-        }else if(token.type.equals(TokenType.Less)){
+        } else if (token.type.equals(TokenType.Less)) {
             match(TokenType.Less);
-        }else if(token.type.equals(TokenType.LessEqual)){
+        } else if (token.type.equals(TokenType.LessEqual)) {
             match(TokenType.LessEqual);
-        }else{
+        } else {
             return;
         }
         operator1();
@@ -101,101 +107,113 @@ public class Parser {
 
 
     }
-    void operator1(){
+
+    void operator1() {
         operator2();
         operation2();
 
     }
-    void operation2(){
 
-        if( token.type.equals(TokenType.Minus) ){
+    void operation2() {
+
+        if (token.type.equals(TokenType.Minus)) {
             match(TokenType.Minus);
-        }else if(token.type.equals(TokenType.Plus) ){
+        } else if (token.type.equals(TokenType.Plus)) {
             match(TokenType.Plus);
-        }else{
+        } else {
             return;
         }
         operator2();
         operation2();
     }
-    void operator2(){
+
+    void operator2() {
         operator3();
         operation3();
     }
-    void operation3(){
-        if( token.type.equals(TokenType.Multiply) ){
+
+    void operation3() {
+        if (token.type.equals(TokenType.Multiply)) {
             match(TokenType.Multiply);
-        }else if(token.type.equals(TokenType.Divide) ) {
+        } else if (token.type.equals(TokenType.Divide)) {
             match(TokenType.Divide);
-        }
-        else{
+        } else {
             return;
         }
         operator3();
         operation3();
     }
-    void operator3(){
 
-        if(token.type.equals(TokenType.Identifier)){
+    void operator3() {
+
+        if (token.type.equals(TokenType.Identifier)) {
 
             match(TokenType.Identifier);
-        }else if (token.type.equals(TokenType.IntLiteral)){
+        } else if (token.type.equals(TokenType.IntLiteral)) {
             match(TokenType.IntLiteral);
         }
     }
 
     //declarations -> variableType variableName
-    void declarations(){
+    void declarations() {
 
+        //one or more declaration
         variableType();
         variableName();
+        while (token.type.equals(TokenType.Int) |
+                token.type.equals(TokenType.String) |
+                token.type.equals(TokenType.Bool)) {
+            variableType();
+            variableName();
+        }
+
 
     }
-    void variableType(){
-        if(token.type.equals(TokenType.Int) ){
+
+    void variableType() {
+        if (token.type.equals(TokenType.Int)) {
             match(TokenType.Int);
-        }else if(token.type.equals(TokenType.String) ){
+        } else if (token.type.equals(TokenType.String)) {
 
             match(TokenType.String);
 
 
-        }else if(token.type.equals(TokenType.Bool) ){
+        } else if (token.type.equals(TokenType.Bool)) {
 
             match(TokenType.Bool);
-        }else{
+        } else {
             error(token.type);
         }
     }
-    void variableName(){
+
+    void variableName() {
         character();
-        while(token.type.equals(TokenType.CharLiteral)){
+        while (token.type.equals(TokenType.Identifier)) {
             character();
-        }while(token.type.equals(TokenType.IntLiteral)){
+        }
+        while (token.type.equals(TokenType.IntLiteral)) {
             number();
         }
     }
-    void character(){
-        match(TokenType.CharLiteral);
+
+    void character() {
+        match(TokenType.Identifier);
     }
-    void number(){
+
+    void number() {
         match(TokenType.IntLiteral);
     }
 
-   void numbers(){
+    void numbers() {
 
         number();
-       while(token.type.equals(TokenType.IntLiteral)) {
-           number();
-       }
+        while (token.type.equals(TokenType.IntLiteral)) {
+            number();
+        }
 
-   }
+    }
 
-
-
-
-
-
-    private void match (TokenType t) {
+    private void match(TokenType t) {
 
         if (token.type.equals(t))
             token = lexer.nextToken();
@@ -204,20 +222,12 @@ public class Parser {
 
     }
 
-
-    private void error(TokenType t){
+    private void error(TokenType t) {
         System.err.println("Syntax error: expecting: " + t
-                + "; saw: " + token.value );
+                + " found: " + token.value);
         System.exit(1);
 
     }
-
-
-public static void main(String[] argv){
-        Parser parser = new Parser(new Lexer("input.txt") );
-        parser.start();
-
-}
 
 
 }
